@@ -1,0 +1,251 @@
+<html>
+  <head>
+    <style>
+      #container {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: space-between;
+        align-items: center;
+        align-content: center;
+        gap: 40px 10px;
+      }
+      #container > div {
+        width: 350px;
+        height: 220px;
+        border: solid 1px;
+        break-inside: avoid;
+      }
+      #container p {
+        text-align: center;
+      }
+      #container img {
+        display: block;
+        margin: 0 auto;
+        width: 95%;
+        height: auto;
+      }
+      #container p.code {
+        margin-top: 4px;
+        letter-spacing: 8px;
+      }
+      @page {
+        size: A4;
+        margin: 1cm 0.5cm;
+        @bottom-left {
+          content: '||title||';
+        }
+        @bottom-right {
+          content: counter(page) ' / ' counter(pages);
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div id="container"></div>
+    <script>
+      window.PagedConfig = {
+        auto: false,
+      };
+    </script>
+    <script src="pinyin-pro.js"></script>
+    <script src="paged.polyfill.js"></script>
+    <script>
+      //||begin-images -- DO NOT MODIFY THE NEXT LINE
+      const images = [
+        {
+          image: 'source2760635704/代熙.jpg',
+          code: '440307105530160048',
+        },
+        {
+          image: 'source2760635704/冯奕鸣.jpg',
+          code: '440307080920160289',
+        },
+        {
+          image: 'source2760635704/叶子林.jpg',
+          code: '440681020020160617',
+        },
+        {
+          image: 'source2760635704/吕磊.jpg',
+          code: '440307125520159743',
+        },
+        {
+          image: 'source2760635704/周婉玥.jpg',
+          code: '440307081220160211',
+        },
+        {
+          image: 'source2760635704/唐语汐.jpg',
+          code: '440304120220160266',
+        },
+        {
+          image: 'source2760635704/姜昕彤.jpg',
+          code: '440311145120160889',
+        },
+        {
+          image: 'source2760635704/岳泽林.jpg',
+          code: '440307083320160151',
+        },
+        {
+          image: 'source2760635704/张涵瑾.jpg',
+          code: '440307082520150367',
+        },
+        {
+          image: 'source2760635704/张纯琪.jpg',
+          code: '440307080920160197',
+        },
+        {
+          image: 'source2760635704/彭宣翔.jpg',
+          code: '440307081220160052',
+        },
+        {
+          image: 'source2760635704/段慕煊.jpg',
+          code: '440305051220160029',
+        },
+        {
+          image: 'source2760635704/殷子皓.jpg',
+          code: '440307130020160374',
+        },
+        {
+          image: 'source2760635704/游诗方.jpg',
+          code: '440304111120160152',
+        },
+        {
+          image: 'source2760635704/王乐一.jpg',
+          code: '440307080920160151',
+        },
+        {
+          image: 'source2760635704/甄若霖.jpg',
+          code: '440307080020151650',
+        },
+        {
+          image: 'source2760635704/白沁玉.jpg',
+          code: '440303035120160090',
+        },
+        {
+          image: 'source2760635704/瞿大为.jpg',
+          code: '440307136420160331',
+        },
+        {
+          image: 'source2760635704/程杨涵.jpg',
+          code: '440307080920160208',
+        },
+        {
+          image: 'source2760635704/童诗雅.jpg',
+          code: '441302050120152146',
+        },
+        {
+          image: 'source2760635704/罗振鑫.jpg',
+          code: '440303041120160130',
+        },
+        {
+          image: 'source2760635704/胡书豪.jpg',
+          code: '440311145220151106',
+        },
+        {
+          image: 'source2760635704/胡妙舟.jpg',
+          code: '440311145220151031',
+        },
+        {
+          image: 'source2760635704/胡婉清.jpg',
+          code: '440311145220160514',
+        },
+        {
+          image: 'source2760635704/范一然.jpg',
+          code: '440307083120150582',
+        },
+        {
+          image: 'source2760635704/邱姮妃.jpg',
+          code: '440307081220160254',
+        },
+        {
+          image: 'source2760635704/郭欣妍.jpg',
+          code: '440307136220160440',
+        },
+        {
+          image: 'source2760635704/郭翊枫.jpg',
+          code: '440307081220150358',
+        },
+        {
+          image: 'source2760635704/都佳城.jpg',
+          code: '440307081220160196',
+        },
+        {
+          image: 'source2760635704/陆相如.jpg',
+          code: '440307081220150378',
+        },
+        {
+          image: 'source2760635704/陈佩芸.jpg',
+          code: '440311145920150428',
+        },
+        {
+          image: 'source2760635704/陈悦菡.jpg',
+          code: '440307080920160231',
+        },
+        {
+          image: 'source2760635704/陈礼彦.jpg',
+          code: '440307081220160105',
+        },
+        {
+          image: 'source2760635704/陶思礼.jpg',
+          code: '440307136420160233',
+        },
+        {
+          image: 'source2760635704/陶源.jpg',
+          code: '440307081220160138',
+        },
+        {
+          image: 'source2760635704/马睿.jpg',
+          code: '440306011020160172',
+        },
+        {
+          image: 'source2760635704/黄杰礼.jpg',
+          code: '440307136220160706',
+        },
+      ];
+      //||end-images -- DO NOT MODIFY THIS LINE
+      images.forEach((entry, index) => {
+        if (!entry.name) {
+          const parts = entry.image.split('/');
+          entry.name = parts[parts.length - 1].split('.')[0];
+        }
+      });
+
+      if (window.location.hash !== '#no-sort') {
+        var { pinyin } = pinyinPro;
+        images.forEach((entry, index) => {
+          entry.pinyin = pinyin(entry.name, {
+            toneType: 'num',
+            surname: 'head',
+          });
+        });
+
+        images.sort((a, b) => {
+          return a.pinyin.localeCompare(b.pinyin);
+        });
+      }
+
+      const container = document.getElementById('container');
+      images.forEach((entry, index) => {
+        const parts = entry.image.split('/');
+        const name = parts[parts.length - 1].split('.')[0];
+
+        const nameNode = document.createElement('p');
+        nameNode.textContent = `${index + 1}. ${entry.name}`;
+        const imgNode = document.createElement('img');
+        imgNode.src = entry.image;
+        const codeNode = document.createElement('p');
+        codeNode.textContent = entry.code;
+        codeNode.className = 'code';
+        const node = document.createElement('div');
+        node.appendChild(nameNode);
+        node.appendChild(imgNode);
+        node.appendChild(codeNode);
+
+        container.appendChild(node);
+      });
+
+      window.PagedPolyfill.preview().then(() => {
+        window.pagedPolyfillDone = true;
+      });
+    </script>
+  </body>
+</html>
