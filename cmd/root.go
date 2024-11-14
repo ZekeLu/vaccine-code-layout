@@ -12,6 +12,8 @@ import (
 	"strings"
 	"time"
 
+	"github.com/boombuler/barcode"
+	"github.com/boombuler/barcode/code128"
 	"github.com/chromedp/cdproto/page"
 	"github.com/chromedp/chromedp"
 	json "github.com/json-iterator/go"
@@ -22,15 +24,13 @@ import (
 
 var (
 	sourceDir, title string
-	width, height    int
+	ratio            float64
 )
 
 func init() {
 	rootCmd.Flags().StringVarP(&sourceDir, "sourceDir", "s", "", "the directory that contains the source images")
 	rootCmd.Flags().StringVarP(&title, "title", "t", "", "the title to display")
-	rootCmd.Flags().IntVarP(&width, "width", "w", 300, "the width of the generated barcode")
-	rootCmd.Flags().IntVarP(&height, "height", "h", 100, "the height of the generated barcode")
-	rootCmd.PersistentFlags().Bool("help", false, "help for gen")
+	rootCmd.Flags().Float64VarP(&ratio, "ratio", "r", 3, "the aspect ratio of the barcode. The width of the barcode is determined by the content, the height is determined by the aspect ratio")
 	rootCmd.MarkFlagRequired("sourceDir")
 
 	rootCmd.SetHelpCommand(nil)
@@ -56,7 +56,7 @@ var rootCmd = &cobra.Command{
 		if err != nil {
 			return err
 		}
-		entries, err := convert(images, folder, width, height)
+		entries, err := convert(images, folder, ratio)
 		if err != nil {
 			return err
 		}
@@ -76,7 +76,7 @@ type entry struct {
 	Code  string `json:"code"`
 }
 
-func convert(images []string, folder string, width, height int) ([]entry, error) {
+func convert(images []string, folder string, ratio float64) ([]entry, error) {
 	entries := make([]entry, 0, len(images))
 	for _, f := range images {
 		code, err := read(f)
@@ -87,7 +87,7 @@ func convert(images []string, folder string, width, height int) ([]entry, error)
 		fileName := filepath.Base(f)
 		outPath := filepath.Join(folder, strings.TrimSuffix(fileName, filepath.Ext(fileName))+".jpg")
 
-		if err := write(outPath, code, width, height); err != nil {
+		if err := write(outPath, code, ratio); err != nil {
 			return entries, err
 		}
 
@@ -126,11 +126,17 @@ func read(filePath string) (string, error) {
 	return result.GetText(), nil
 }
 
-func write(outPath, code string, width, height int) error {
-	enc := oned.NewCode128Writer()
-	img, err := enc.Encode(code, gozxing.BarcodeFormat_CODE_128, width, height, nil)
+func write(outPath, code string, ratio float64) error {
+	bc, err := code128.Encode(code)
 	if err != nil {
 		return fmt.Errorf("encode %s, %s: %w", outPath, code, err)
+	}
+	rect := bc.Bounds()
+	width := rect.Dx()
+	height := int(float64(width) / ratio)
+	img, err := barcode.Scale(bc, width, height)
+	if err != nil {
+		return fmt.Errorf("scale %s, %s: %w", outPath, code, err)
 	}
 
 	file, err := os.Create(outPath)

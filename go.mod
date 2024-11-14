@@ -3,6 +3,7 @@ module me.local/bc
 go 1.23.3
 
 require (
+	github.com/boombuler/barcode v1.0.2
 	github.com/chromedp/cdproto v0.0.0-20241022234722-4d5d5faf59fb
 	github.com/chromedp/chromedp v0.11.2
 	github.com/json-iterator/go v1.1.12
