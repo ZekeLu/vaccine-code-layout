@@ -8,18 +8,10 @@
 go run . -s [source_dir] -t [title]
 ```
 
-- `[source_dir]`: 原始预登记码(jpg 文件)的存放位置
+- `[source_dir]`: 原始预登记码(jpg/jpeg/png 文件)的存放位置。目录中不能包含其他格式的文件，也不能有同名(仅扩展名不同)的文件
 - `[title]`: 生成的 PDF 文件名
 
 # Q&A
-
-## 如何把当前目录下的多个 png 文件转换成 jpg 文件?
-
-使用 GraphicsMagick 来转换：
-
-```shell
-for f in *.png; do gm convert "$f" "${f%.png}.jpg"; done
-```
 
 ## 接龙管理中下载的 zip 压缩包解压出来的文件名都是乱码，要怎么处理?
 

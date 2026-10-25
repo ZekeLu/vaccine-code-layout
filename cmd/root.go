@@ -7,6 +7,7 @@ import (
 	"fmt"
 	"image"
 	"image/jpeg"
+	_ "image/png"
 	"os"
 	"path/filepath"
 	"strings"
@@ -42,7 +43,7 @@ var rootCmd = &cobra.Command{
                 love by spf13 and friends in Go.
                 Complete documentation is available at https://gohugo.io/documentation/`,
 	RunE: func(cmd *cobra.Command, args []string) error {
-		images, err := filepath.Glob(sourceDir + "/*.jpg")
+		images, err := list(sourceDir)
 		if err != nil {
 			return err
 		}
@@ -59,8 +60,76 @@ var rootCmd = &cobra.Command{
 		if err != nil {
 			return err
 		}
-		return print(title, entries)
+		if err := print(title, entries); err != nil {
+			return err
+		}
+		summarize(images, folder, title+".pdf")
+		return nil
 	},
+}
+
+// supportedExts maps the lower-cased extensions of the supported source
+// images to the format names used in the summary.
+var supportedExts = map[string]string{
+	".jpg":  "jpeg",
+	".jpeg": "jpeg",
+	".png":  "png",
+}
+
+// list returns the source images in dir. It reports an error if dir
+// contains a file in an unsupported format, or files that would be
+// written to the same output file (e.g. "a.jpg" and "a.png").
+func list(dir string) ([]string, error) {
+	dirEntries, err := os.ReadDir(dir)
+	if err != nil {
+		return nil, err
+	}
+
+	var (
+		images []string
+		errs   []error
+		seen   = make(map[string]string)
+	)
+	for _, e := range dirEntries {
+		if e.IsDir() {
+			continue
+		}
+		name := e.Name()
+		ext := filepath.Ext(name)
+		if _, ok := supportedExts[strings.ToLower(ext)]; !ok {
+			errs = append(errs, fmt.Errorf("unsupported file format: %s", filepath.Join(dir, name)))
+			continue
+		}
+		// Compare case-insensitively to be safe on case-insensitive file systems.
+		stem := strings.ToLower(strings.TrimSuffix(name, ext))
+		if prev, ok := seen[stem]; ok {
+			errs = append(errs, fmt.Errorf("files with the same name: %s and %s", filepath.Join(dir, prev), filepath.Join(dir, name)))
+			continue
+		}
+		seen[stem] = name
+		images = append(images, filepath.Join(dir, name))
+	}
+	if len(errs) > 0 {
+		return nil, errors.Join(errs...)
+	}
+	if len(images) == 0 {
+		return nil, fmt.Errorf("no images found in %s", dir)
+	}
+
+	return images, nil
+}
+
+func summarize(images []string, folder, pdf string) {
+	counts := make(map[string]int)
+	for _, f := range images {
+		counts[supportedExts[strings.ToLower(filepath.Ext(f))]]++
+	}
+	fmt.Printf("Handled %d files (jpeg: %d, png: %d)\n", len(images), counts["jpeg"], counts["png"])
+	for _, f := range images {
+		fmt.Printf("  %s\n", f)
+	}
+	fmt.Printf("Barcodes: %s\n", folder)
+	fmt.Printf("PDF: %s\n", pdf)
 }
 
 func Execute() {
