@@ -14,7 +14,6 @@ import (
 
 	"github.com/boombuler/barcode"
 	"github.com/boombuler/barcode/code128"
-	"github.com/chromedp/cdproto/page"
 	"github.com/chromedp/chromedp"
 	json "github.com/json-iterator/go"
 	"github.com/makiuchi-d/gozxing"
@@ -188,18 +187,21 @@ func print(title string, entries []entry) error {
 	}
 	ctx, cancel := chromedp.NewContext(context.Background())
 	defer cancel()
-	return chromedp.Run(ctx,
-		chromedp.Navigate("file://"+p),
-		chromedp.Poll(`window.pagedPolyfillDone === true`, nil),
-		// wait for 1 second to be safe.
-		chromedp.Sleep(time.Second),
-		chromedp.ActionFunc(func(ctx context.Context) error {
-			buf, _, err := page.PrintToPDF().Do(ctx)
-			if err != nil {
-				return err
-			}
+	if err := chromedp.Do(ctx, chromedp.Navigate("file://"+p)); err != nil {
+		return err
+	}
+	if _, err := chromedp.Run(ctx, chromedp.Poll[bool](`window.pagedPolyfillDone === true`)); err != nil {
+		return err
+	}
+	// wait for 1 second to be safe.
+	if err := chromedp.Do(ctx, chromedp.Sleep(time.Second)); err != nil {
+		return err
+	}
 
-			return os.WriteFile(title+".pdf", buf, 0o644)
-		}),
-	)
+	buf, err = chromedp.Run(ctx, chromedp.PrintToPDF())
+	if err != nil {
+		return err
+	}
+
+	return os.WriteFile(title+".pdf", buf, 0o644)
 }
